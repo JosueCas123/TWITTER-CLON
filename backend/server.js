@@ -6,6 +6,7 @@ import cookieParser from 'cookie-parser';
 import authRoutes from './routes/auth.route.js';
 import userRoutes from './routes/user.route.js';
 import postRoutes from './routes/posts.route.js';
+import notificationRoutes from './routes/notification.route.js';
 
 import { v2 as cloudinary} from 'cloudinary';
 
@@ -26,6 +27,7 @@ const PORT = 4000;
 app.use('/api/auth', authRoutes);
 app.use('/api/user', userRoutes);
 app.use('/api/posts', postRoutes);
+app.use('/api/notification', notificationRoutes);
 
 
 app.listen(PORT, () => {
