@@ -104,7 +104,7 @@ export const logout = (req, res) => {
 export const getMe = async(req, res) => {
        // get user data from token
        try {
-        const user = await User.findById(req.user).select('-password');
+        const user = await User.findById(req.user._id).select('-password');
         if (!user) {
             return res.status(404).json('User not found')
         }

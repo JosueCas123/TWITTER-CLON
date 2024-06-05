@@ -1,5 +1,6 @@
 import express from 'express';
 import dotenv from 'dotenv'
+import cors from 'cors';
 import connectMongoDB from './db/connectMongomDB.js';
 import cookieParser from 'cookie-parser';
 
@@ -22,6 +23,21 @@ cloudinary.config({
 app.use(express.json()); // to parse 
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
+
+// const dominiosPermitidos = ["http://localhost:3000"]
+
+// const corsOptions = {
+//     origin: function(origin, callback){
+//         if (dominiosPermitidos.indexOf(origin) !== -1 ) {
+//             callback(null, true)
+//         }else{
+//             callback(new Error('No permitido por cors'))
+//         }
+//     }
+// }
+
+app.use(cors())
+
 const PORT = 4000;
 
 app.use('/api/auth', authRoutes);
