@@ -8,13 +8,16 @@ import { Link } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import LoadingSpinner from "./LoadingSpinner ";
+import { useLike } from "../../hooks/useLike";
 
 const Post = ({ post }:any) => {
 	const [comment, setComment] = useState("");
-	const queryClient = useQueryClient();
 	const {data:authUser}:any= useQuery({queryKey: ['authUser']});
-
-	const {mutate:delet, isPending} = useMutation({
+	const queryClient = useQueryClient();
+	const postOwner = post.user;
+	const isLiked = post.likes.includes(authUser?._id);
+	const isMyPost = authUser?._id === post.user._id;
+	const {mutate:delet, isPending:isDelete} = useMutation({
 		mutationFn: async () => {
 			try {
 				const res = await fetch(`/api/posts/${post._id}`, {
@@ -36,10 +39,34 @@ const Post = ({ post }:any) => {
 	
 	});
 
-	const postOwner = post.user;
-	const isLiked = false;
 
-	const isMyPost = authUser?._id === post.user._id;
+    // const {mutate:likePost, isPending:isLiking} = useMutation ({
+    //     mutationFn: async () => {
+    //         try {
+    //              // Define the 'post' variable here
+    //             const resp = await fetch(`/api/posts/like/${post._id}`, {
+    //                 method: "POST",
+    //             })
+    //             const data = await resp.json();
+    //             if (!resp.ok) {
+    //                 throw new Error(data.message || "Something went wrong!");
+    //             }
+    //             return data;
+    //         } catch (error:any) {
+    //             throw new Error(error);
+    //         }
+    //     },
+
+    //     onSuccess: () => {
+    //         toast.success("Post liked successfully");
+    //         queryClient.invalidateQueries({queryKey: ["posts"]});
+    //     },
+    //     onError: (error:any) => {
+    //         toast.error(error.message);
+    //     }
+    // })
+
+	const {likePost, isLiking}  = useLike();
 
 	const formattedDate = "1h";
 
@@ -53,7 +80,12 @@ const Post = ({ post }:any) => {
 		e.preventDefault();
 	};
 
-	const handleLikePost = () => {};
+	const handleLikePost = () => {
+		
+		 if(isLiking) return;
+		 likePost(post?._id);
+	};
+	
 
 	return (
 		<>
@@ -75,9 +107,9 @@ const Post = ({ post }:any) => {
 						</span>
 						{isMyPost && (
 							<span className='flex justify-end flex-1'>
-								{!isPending && <FaTrash className='cursor-pointer hover:text-red-500' onClick={handleDeletePost} />}
+								{!isDelete && <FaTrash className='cursor-pointer hover:text-red-500' onClick={handleDeletePost} />}
 								{
-									isPending && (
+									isDelete && (
 										<LoadingSpinner size="lg"/>
 									)
 								}
@@ -169,14 +201,17 @@ const Post = ({ post }:any) => {
 								<span className='text-sm text-slate-500 group-hover:text-green-500'>0</span>
 							</div>
 							<div className='flex gap-1 items-center group cursor-pointer' onClick={handleLikePost}>
-								{!isLiked && (
+								{isLiking && <LoadingSpinner size='sm' />}
+								{!isLiked && !isLiking && (
 									<FaRegHeart className='w-4 h-4 cursor-pointer text-slate-500 group-hover:text-pink-500' />
 								)}
-								{isLiked && <FaRegHeart className='w-4 h-4 cursor-pointer text-pink-500 ' />}
+								{isLiked && !isLiking && (
+									<FaRegHeart className='w-4 h-4 cursor-pointer text-pink-500 ' />
+								)}
 
 								<span
-									className={`text-sm text-slate-500 group-hover:text-pink-500 ${
-										isLiked ? "text-pink-500" : ""
+									className={`text-sm  group-hover:text-pink-500 ${
+										isLiked ? "text-pink-500" : "text-slate-500"
 									}`}
 								>
 									{post.likes.length}
