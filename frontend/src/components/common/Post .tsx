@@ -3,15 +3,17 @@ import { BiRepost } from "react-icons/bi";
 import { FaRegHeart } from "react-icons/fa";
 import { FaRegBookmark } from "react-icons/fa6";
 import { FaTrash } from "react-icons/fa";
-import { useState } from "react";
+
 import { Link } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import LoadingSpinner from "./LoadingSpinner ";
 import { useLike } from "../../hooks/useLike";
+import { useCommetPost } from "../../hooks/useCommetPost";
+import ReactTimeago from "react-timeago";
 
 const Post = ({ post }:any) => {
-	const [comment, setComment] = useState("");
+	console.log("post",post);
 	const {data:authUser}:any= useQuery({queryKey: ['authUser']});
 	const queryClient = useQueryClient();
 	const postOwner = post.user;
@@ -40,35 +42,12 @@ const Post = ({ post }:any) => {
 	});
 
 
-    // const {mutate:likePost, isPending:isLiking} = useMutation ({
-    //     mutationFn: async () => {
-    //         try {
-    //              // Define the 'post' variable here
-    //             const resp = await fetch(`/api/posts/like/${post._id}`, {
-    //                 method: "POST",
-    //             })
-    //             const data = await resp.json();
-    //             if (!resp.ok) {
-    //                 throw new Error(data.message || "Something went wrong!");
-    //             }
-    //             return data;
-    //         } catch (error:any) {
-    //             throw new Error(error);
-    //         }
-    //     },
-
-    //     onSuccess: () => {
-    //         toast.success("Post liked successfully");
-    //         queryClient.invalidateQueries({queryKey: ["posts"]});
-    //     },
-    //     onError: (error:any) => {
-    //         toast.error(error.message);
-    //     }
-    // })
-
+	//hook para dar like
 	const {likePost, isLiking}  = useLike();
+	//hook para comentar
+	const {commentPost, isPending,comment,setComment} = useCommetPost();
 
-	const formattedDate = "1h";
+	const formattedDate = <ReactTimeago date={new Date(post.createdAt)} locale="en-ES"/>;
 
 	const isCommenting = false;
 
@@ -78,6 +57,9 @@ const Post = ({ post }:any) => {
 
 	const handlePostComment = (e:any) => {
 		e.preventDefault();
+		if (comment.trim() === "") return;
+		commentPost(post._id);
+		console.log("comment",post.comments);
 	};
 
 	const handleLikePost = () => {
@@ -168,6 +150,7 @@ const Post = ({ post }:any) => {
 															@{comment.user.username}
 														</span>
 													</div>
+									
 													<div className='text-sm'>{comment.text}</div>
 												</div>
 											</div>
@@ -187,7 +170,7 @@ const Post = ({ post }:any) => {
 											{isCommenting ? (
 												<span className='loading loading-spinner loading-md'></span>
 											) : (
-												"Post"
+												isPending ? "Posting..." : "Post"
 											)}
 										</button>
 									</form>

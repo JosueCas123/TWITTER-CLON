@@ -20,6 +20,7 @@ export const createPost = async (req, res) => {
         }
 
         const newPost = new Post({
+            ...Post,
             user: userId,
             text,
             img
@@ -69,8 +70,9 @@ export const createOnPost = async (req, res) => {
     if(!post) return res.status(404).json("Post not found")
 
     const newComment = {
+        ...post,
         text,
-        user: userId
+        user: userId,
     }
 
     post.comments.push(newComment)
