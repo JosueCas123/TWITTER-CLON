@@ -1,36 +1,19 @@
-import { Link } from "react-router-dom";
+import { Link, } from "react-router-dom";
 
 
 import { IoSettingsOutline } from "react-icons/io5";
 import { FaUser } from "react-icons/fa";
 import { FaHeart } from "react-icons/fa6";
 import LoadingSpinner from "../../components/common/LoadingSpinner ";
+import { useNotification } from "../../hooks/useNotification";
 
 const NotificationPage = () => {
-	const isLoading = false;
-	const notifications = [
-		{
-			_id: "1",
-			from: {
-				_id: "1",
-				username: "johndoe",
-				profileImg: "/avatars/boy2.png",
-			},
-			type: "follow",
-		},
-		{
-			_id: "2",
-			from: {
-				_id: "2",
-				username: "janedoe",
-				profileImg: "/avatars/girl1.png",
-			},
-			type: "like",
-		},
-	];
 
+	const {notifications, isLoading, deleteNotification,isPending} = useNotification();
+	console.log("notifications",notifications);
 	const deleteNotifications = () => {
 		alert("All notifications deleted");
+		deleteNotification();
 	};
 
 	return (
@@ -58,7 +41,7 @@ const NotificationPage = () => {
 					</div>
 				)}
 				{notifications?.length === 0 && <div className='text-center p-4 font-bold'>No notifications 🤔</div>}
-				{notifications?.map((notification) => (
+				{notifications?.map((notification:any) => (
 					<div className='border-b border-gray-700' key={notification._id}>
 						<div className='flex gap-2 p-4'>
 							{notification.type === "follow" && <FaUser className='w-7 h-7 text-primary' />}
