@@ -26,11 +26,11 @@ export const useLike = () => {
             toast.success("Post liked successfully");
             queryClient.setQueryData(["posts"],(oldData:any)=> {
 
-                return oldData.map((post:any) => {
-                    if(post._id === post._id) {
-                        return {...post, likes: updateLikes};
+                return oldData.map((p:any) => {
+                    if(p._id === post?._id) {
+                        return {...p, likes: updateLikes};
                     }
-                    return post;
+                    return p;
                 })
             })
             

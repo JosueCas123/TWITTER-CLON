@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 
 import Posts from "../../components/common/Posts";
@@ -13,10 +13,10 @@ import { MdEdit } from "react-icons/md";
 import ProfileHeaderSkeleton from "../../components/skeletons/ProfileHeaderSkeleton";
 import EditProfileModal from "./EditProfileModal ";
 import { useQuery } from "@tanstack/react-query";
+import { useUserProfile } from "../../hooks/useUserProfile";
+import ReactTimeago from "react-timeago";
 
 const ProfilePage = () => {
-
-	useQuery({queryKey: ['authUser']});
 
 	const [coverImg, setCoverImg] = useState(null);
 	const [profileImg, setProfileImg] = useState(null);
@@ -25,21 +25,11 @@ const ProfilePage = () => {
 	const coverImgRef: React.MutableRefObject<HTMLInputElement | null> = useRef(null);
 	const profileImgRef: React.MutableRefObject<HTMLInputElement | null> = useRef(null);
 
-	const isLoading = false;
-	const isMyProfile = true;
 
-	const user = {
-		_id: "1",
-		fullName: "John Doe",
-		username: "johndoe",
-		profileImg: "/avatars/boy2.png",
-		coverImg: "/cover.png",
-		bio: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-		link: "https://youtube.com/@asaprogrammer_",
-		following: ["1", "2", "3"],
-		followers: ["1", "2", "3"],
-	};
-
+	const { data: authUser }:any = useQuery({ queryKey: ["authUser"] });
+	const {user,isLoading, isRefetching, refetch,username} = useUserProfile();
+	
+	const isMyProfile = authUser?._id === user?._id;
 const handleImgChange = (e: any, p0: string) => {
     const file = e.target.files[0];
     if (file) {
@@ -54,15 +44,17 @@ const handleImgChange = (e: any, p0: string) => {
         reader.readAsDataURL(file);
     }
 };
-
+useEffect(() => {
+	refetch();
+}, [username, refetch]);
 	return (
 		<>
 			<div className='flex-[4_4_0]  border-r border-gray-700 min-h-screen '>
 				{/* HEADER */}
-				{isLoading && <ProfileHeaderSkeleton />}
-				{!isLoading && !user && <p className='text-center text-lg mt-4'>User not found</p>}
+				{(isLoading || isRefetching) && <ProfileHeaderSkeleton />}
+				{!isLoading || isRefetching  && !user && <p className='text-center text-lg mt-4'>User not found</p>}
 				<div className='flex flex-col'>
-					{!isLoading && user && (
+					{!isLoading  && user && (
 						<>
 							<div className='flex gap-10 px-4 py-2 items-center'>
 								<Link to='/'>
@@ -163,7 +155,7 @@ const handleImgChange = (e: any, p0: string) => {
 									)}
 									<div className='flex gap-2 items-center'>
 										<IoCalendarOutline className='w-4 h-4 text-slate-500' />
-										<span className='text-sm text-slate-500'>Joined July 2021</span>
+										<span className='text-sm text-slate-500'><ReactTimeago date={user?.createdAt} /></span>
 									</div>
 								</div>
 								<div className='flex gap-2'>
@@ -200,7 +192,7 @@ const handleImgChange = (e: any, p0: string) => {
 						</>
 					)}
 
-					<Posts />
+					<Posts  feedType={feedType} username={username} userId={user?._id}/>
 				</div>
 			</div>
 		</>

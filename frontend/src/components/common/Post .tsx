@@ -43,11 +43,44 @@ const Post = ({ post }:any) => {
 
 
 	//hook para dar like
-	const {likePost, isLiking}  = useLike();
+	const {mutate:likePost, isPending:isLiking} = useMutation ({
+        mutationFn: async (post:any) => {
+            try {
+                const resp = await fetch(`/api/posts/like/${post}`, {
+                    method: "POST",
+                })
+                const data = await resp.json();
+                if (!resp.ok) {
+                    throw new Error(data.message || "Something went wrong!");
+                }
+                return data;
+            } catch (error:any) {
+                throw new Error(error);
+            }
+        },
+
+        onSuccess: (updateLikes) => {
+            toast.success("Post liked successfully");
+            queryClient.setQueryData(["posts"],(oldData:any)=> {
+
+                return oldData.map((p:any) => {
+                    if(p._id === post?._id) {
+                        return {...p, likes: updateLikes};
+                    }
+                    return p;
+                })
+            })
+            
+        },
+
+        onError: (error:any) => {
+            toast.error(error.message);
+        }
+    })
 	//hook para comentar
 	const {commentPost, isPending,comment,setComment} = useCommetPost();
 
-	const formattedDate = <ReactTimeago date={new Date(post.createdAt)} locale="en-ES"/>;
+	const formattedDate = <ReactTimeago date={new Date(post.createdAt)} locale="e-ES"/>;
 
 	const isCommenting = false;
 

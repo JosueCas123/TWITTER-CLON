@@ -5,7 +5,7 @@ import PostSkeleton from "../skeletons/PostSkeleton ";
 import Post from "./Post ";
 import { useEffect } from "react";
 
-const Posts = ({feedType}:any) => {
+const Posts = ({feedType, username,userId}:any) => {
 	
 	const getPostEndpoint = () => {
 		switch (feedType) {
@@ -13,6 +13,10 @@ const Posts = ({feedType}:any) => {
 				return '/api/posts/all';
 			case 'following':
 				return '/api/posts/following';
+			case 'posts':
+				return `/api/posts/user/${username}` ;
+			case "likes":
+				return `/api/posts/likes/${userId}`;
 			default:
 				return '/api/posts/all';
 		}
@@ -42,7 +46,7 @@ const Posts = ({feedType}:any) => {
 
 	useEffect(() => {
 		refetch();
-	}, [feedType,refetch]);
+	}, [feedType,refetch,username]);
 
 
 	return (
