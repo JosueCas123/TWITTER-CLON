@@ -3,41 +3,45 @@ import XSvg from "../svgs/X";
 import { MdHomeFilled } from "react-icons/md";
 import { IoNotifications } from "react-icons/io5";
 import { FaUser } from "react-icons/fa";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { BiLogOut } from "react-icons/bi";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
+import { useEffect } from "react";
 
 const Sidebar = () => {
-	const queryClient = useQueryClient()
+	const queryClient = useQueryClient();
+	const navigate = useNavigate();
 
-	
-	const {mutate:logout} = useMutation({
+	const { mutate: logout } = useMutation({
 		mutationFn: async () => {
 			try {
-				const res = await fetch('/api/auth/logout', {
-					method: 'POST',
-				})
-				const data = await res.json()
-				if(!res.ok) throw new Error(data.error || 'Something went wrong') 
-			} catch (error) {
-				console.error(error)
-				throw error	
+				const res = await fetch("/api/auth/logout", {
+					method: "POST",
+				});
+				const data = await res.json();
+
+				if (!res.ok) {
+					throw new Error(data.error || "Something went wrong");
+				}
+			} catch (error:any) {
+				throw new Error(error);
 			}
 		},
-
 		onSuccess: () => {
-			queryClient.invalidateQueries({queryKey: ['authUser']})
+			queryClient.invalidateQueries({ queryKey: ["authUser"] });
+			navigate("/login");
 		},
 		onError: () => {
-			toast.error("Failed to logout")
-		}
+			toast.error("Logout failed");
+		},
+	});
 
-	})
+	const { data: authUser }:any = useQuery({ queryKey: ["authUser"] });
 
-	const {data:authUser}:any = useQuery({queryKey: ['authUser']})
-
-
+	const logoutPerfil = () => {
+		logout();
+	};
 	return (
 		<div className='md:flex-[2_2_0] w-18 max-w-52'>
 			<div className='sticky top-0 left-0 h-screen flex flex-col border-r border-gray-700 w-20 md:w-full'>
@@ -92,7 +96,7 @@ const Sidebar = () => {
 							<BiLogOut className='w-5 h-5 cursor-pointer'
 								onClick={(e) => {
 									e.preventDefault()
-									logout()
+									logoutPerfil()
 								}}
 							/>
 						</div>
