@@ -15,21 +15,26 @@ import EditProfileModal from "./EditProfileModal ";
 import { useQuery } from "@tanstack/react-query";
 import { useUserProfile } from "../../hooks/useUserProfile";
 import ReactTimeago from "react-timeago";
+import { useFollow } from "../../hooks/useFollow";
+import { useUdateProfile } from "../../hooks/useUdateProfile";
 
 const ProfilePage = () => {
 
-	const [coverImg, setCoverImg] = useState(null);
-	const [profileImg, setProfileImg] = useState(null);
+	const [coverImage, setCoverImage] = useState(null);
+	const [profileImage, setProfileImage] = useState(null);
 	const [feedType, setFeedType] = useState("posts");
-
+	
 	const coverImgRef: React.MutableRefObject<HTMLInputElement | null> = useRef(null);
 	const profileImgRef: React.MutableRefObject<HTMLInputElement | null> = useRef(null);
-
-
+	
+	
 	const { data: authUser }:any = useQuery({ queryKey: ["authUser"] });
+	const {follow,isPending} = useFollow();
+	const {updateProfile, isUpdatingProfile} = useUdateProfile();
 	const {user,isLoading, isRefetching, refetch,username} = useUserProfile();
 	
 	const isMyProfile = authUser?._id === user?._id;
+	const amIFollowing = authUser?.following.includes(user?._id);
 const handleImgChange = (e: any, p0: string) => {
     const file = e.target.files[0];
     if (file) {
@@ -37,8 +42,8 @@ const handleImgChange = (e: any, p0: string) => {
         reader.onload = () => {
             const result = reader.result as any;
             if (result !== null) {
-                p0 === "coverImg" && setCoverImg(result);
-                p0 === "profileImg" && setProfileImg(result);
+                p0 === "coverImg" && setCoverImage(result);
+                p0 === "profileImg" && setProfileImage(result);
             }
         };
         reader.readAsDataURL(file);
@@ -68,7 +73,7 @@ useEffect(() => {
 							{/* COVER IMG */}
 							<div className='relative group/cover'>
 								<img
-									src={coverImg || user?.coverImg || "/cover.png"}
+									src={coverImage || user?.coverImage || "/cover.png"}
 									className='h-52 w-full object-cover'
 									alt='cover image'
 								/>
@@ -98,7 +103,7 @@ useEffect(() => {
 								{/* USER AVATAR */}
 								<div className='avatar absolute -bottom-16 left-4'>
 									<div className='w-32 rounded-full relative group/avatar'>
-										<img src={profileImg || user?.profileImg || "/avatar-placeholder.png"} />
+										<img src={profileImage || user?.profileImage || "/avatar-placeholder.png"} />
 										<div className='absolute top-5 right-3 p-1 bg-primary rounded-full group-hover/avatar:opacity-100 opacity-0 cursor-pointer'>
 											{isMyProfile && (
 												<MdEdit
@@ -111,21 +116,25 @@ useEffect(() => {
 								</div>
 							</div>
 							<div className='flex justify-end px-4 mt-5'>
-								{isMyProfile && <EditProfileModal />}
+								{isMyProfile && <EditProfileModal authUser={authUser}/>}
 								{!isMyProfile && (
 									<button
 										className='btn btn-outline rounded-full btn-sm'
-										onClick={() => alert("Followed successfully")}
+										onClick={() => follow(user?._id)}
 									>
-										Follow
+									{isPending && "Loading..."}
+										{!isPending && amIFollowing && "Unfollow"}
+										{!isPending && !amIFollowing && "Follow"}
 									</button>
 								)}
-								{(coverImg || profileImg) && (
+								{(coverImage || profileImage) && (
 									<button
 										className='btn btn-primary rounded-full btn-sm text-white px-4 ml-2'
-										onClick={() => alert("Profile updated successfully")}
+										onClick={()=>{		
+								 	updateProfile({coverImage,profileImage});
+										}}
 									>
-										Update
+										{isUpdatingProfile ? "Updating..." : "Update"}
 									</button>
 								)}
 							</div>
@@ -148,7 +157,7 @@ useEffect(() => {
 													rel='noreferrer'
 													className='text-sm text-blue-500 hover:underline'
 												>
-													youtube.com/@asaprogrammer_
+													{user?.link}
 												</a>
 											</>
 										</div>

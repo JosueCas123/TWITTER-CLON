@@ -94,7 +94,7 @@ export const getSuggestedUsers = async(req,res) => {
 
 export const updateUser = async (req, res) => {
     const {username,fullName,email, currentPassword, newPassword, bio, link} = req.body
-    let {profileImg, coverImg} = req.body;
+    let {profileImage, coverImage} = req.body;
 
     const userId = req.user._id
 
@@ -117,20 +117,21 @@ export const updateUser = async (req, res) => {
             user.password = await bcrypt.hash(newPassword, salt)
         }
 
-        if(profileImg){
-            if(user.profileImg){
-                await cloudinary.uploader.destroy(user.profileImg.split('/').pop().slice(".")[0])
+        if(profileImage){
+            if(user.profileImage){
+                await cloudinary.uploader.destroy(user.profileImage.split("/").pop().split(".")[0]);
             }
-          const uploadedResponse = await cloudinary.uploader.upload(profileImg)
-          profileImg = uploadedResponse.secure_url
+          const uploadedResponse = await cloudinary.uploader.upload(profileImage)
+          profileImage = uploadedResponse.secure_url
         }
 
-        if(coverImg){
-            if(user.coverImg){
-                await cloudinary.uploader.destroy(user.coverImg.split('/').pop().slice(".")[0])
-            }
-            const uploadedResponse = await cloudinary.uploader.upload(coverImg)
-            coverImg = uploadedResponse.secure_url
+        if(coverImage){
+            if (user.coverImage) {
+				await cloudinary.uploader.destroy(user.coverImage.split("/").pop().split(".")[0]);
+			}
+
+            const uploadedResponse = await cloudinary.uploader.upload(coverImage)
+            coverImage = uploadedResponse.secure_url
         }
 
         user.username = username || user.username
@@ -138,8 +139,8 @@ export const updateUser = async (req, res) => {
         user.email = email || user.email
         user.bio = bio || user.bio
         user.link = link || user.link
-        user.profileImg = profileImg || user.profileImg
-        user.coverImg = coverImg || user.coverImg
+        user.profileImage = profileImage || user.profileImage
+        user.coverImage = coverImage || user.coverImage
 
         user = await user.save()
         user.password = null
