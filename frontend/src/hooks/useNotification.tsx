@@ -26,7 +26,7 @@ export const useNotification = () => {
 
  });
 
- const {mutate:deleteNotification, isPending} = useMutation({
+ const {mutate:deleteNotification} = useMutation({
         mutationFn: async () => {
             try {
                 const res = await fetch(`/api/notification`, {
@@ -54,6 +54,6 @@ export const useNotification = () => {
         notifications,
         isLoading,
         deleteNotification,
-        isPending,
+        
     }
 }

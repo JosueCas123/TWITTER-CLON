@@ -9,7 +9,7 @@ import { useNotification } from "../../hooks/useNotification";
 
 const NotificationPage = () => {
 
-	const {notifications, isLoading, deleteNotification,isPending} = useNotification();
+	const {notifications, isLoading, deleteNotification} = useNotification();
 	console.log("notifications",notifications);
 	const deleteNotifications = () => {
 		alert("All notifications deleted");

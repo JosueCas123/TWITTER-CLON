@@ -11,7 +11,7 @@ import { MdPassword } from "react-icons/md";
 import { MdDriveFileRenameOutline } from "react-icons/md";
 import XSvg from "../../../components/svgs/X";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import toast from "react-hot-toast";
+
 
 interface SignUpFormData {
 	email: string;

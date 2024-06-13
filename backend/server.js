@@ -1,3 +1,4 @@
+import path from 'path';
 import express from 'express';
 import dotenv from 'dotenv'
 import cors from 'cors';
@@ -13,16 +14,18 @@ import { v2 as cloudinary} from 'cloudinary';
 
 
 
-const app = express();
 dotenv.config();
 cloudinary.config({
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
     api_key: process.env.CLOUDINARY_API_KEY,
     api_secret: process.env.CLOUDINARY_API_SECRET
-});
-app.use(express.json({limit:"5mb"})); // to parse 
+    });
+const app = express();
+ app.use(express.json({limit:"5mb"})); // to parse 
 app.use(express.urlencoded({ extended: true }));
+const __dirname = path.resolve();
 app.use(cookieParser());
+
 
 // const dominiosPermitidos = ["http://localhost:3000"]
 
@@ -36,14 +39,22 @@ app.use(cookieParser());
 //     }
 // }
 
-app.use(cors())
+// app.use(cors())
 
-const PORT = 4000;
+const PORT =process.env.PORT || 4000;
 
 app.use('/api/auth', authRoutes);
 app.use('/api/user', userRoutes);
 app.use('/api/posts', postRoutes);
 app.use('/api/notification', notificationRoutes);
+
+if (process.env.NODE_ENV === "production") {
+	app.use(express.static(path.join(__dirname, "/frontend/dist")));
+
+	app.get("*", (req, res) => {
+		res.sendFile(path.resolve(__dirname, "frontend", "dist", "index.html"));
+	});
+}
 
 
 app.listen(PORT, () => {
