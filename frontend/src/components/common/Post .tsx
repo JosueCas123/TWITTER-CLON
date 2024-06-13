@@ -18,7 +18,7 @@ const Post = ({ post }:any) => {
 	const queryClient = useQueryClient();
 	const postOwner = post.user;
 	const isLiked = post.likes.includes(authUser?._id);
-	const isMyPost = authUser?._id === post.user._id;
+	const isMyPost = authUser?._id === post.user?._id;
 	const {mutate:delet, isPending:isDelete} = useMutation({
 		mutationFn: async () => {
 			try {
@@ -106,17 +106,17 @@ const Post = ({ post }:any) => {
 		<>
 			<div className='flex gap-2 items-start p-4 border-b border-gray-700'>
 				<div className='avatar'>
-					<Link to={`/profile/${postOwner.username}`} className='w-8 h-8 rounded-full overflow-hidden'>
-						<img src={postOwner.profileImage || "/avatar-placeholder.png"} />
+					<Link to={`/profile/${postOwner?.username}`} className='w-8 h-8 rounded-full overflow-hidden'>
+						<img src={postOwner?.profileImage || "/avatar-placeholder.png"} />
 					</Link>
 				</div>
 				<div className='flex flex-col flex-1'>
 					<div className='flex gap-2 items-center'>
-						<Link to={`/profile/${postOwner.username}`} className='font-bold'>
-							{postOwner.fullName}
+						<Link to={`/profile/${postOwner?.username}`} className='font-bold'>
+							{postOwner?.fullName}
 						</Link>
 						<span className='text-gray-700 flex gap-1 text-sm'>
-							<Link to={`/profile/${postOwner.username}`}>@{postOwner.username}</Link>
+							<Link to={`/profile/${postOwner?.username}`}>@{postOwner?.username}</Link>
 							<span>·</span>
 							<span>{formattedDate}</span>
 						</span>
@@ -146,7 +146,7 @@ const Post = ({ post }:any) => {
 <div
     className='flex gap-1 items-center cursor-pointer group'
     onClick={() => {
-        const modal = document.getElementById("comments_modal" + post._id) as HTMLDialogElement;
+        const modal = document.getElementById("comments_modal" + post?._id) as HTMLDialogElement;
         if (modal) {
             modal.showModal();
         }
@@ -158,7 +158,7 @@ const Post = ({ post }:any) => {
     </span>
 </div>
 							{/* We're using Modal Component from DaisyUI */}
-							<dialog id={`comments_modal${post._id}`} className='modal border-none outline-none'>
+							<dialog id={`comments_modal${post?._id}`} className='modal border-none outline-none'>
 								<div className='modal-box rounded border border-gray-600'>
 									<h3 className='font-bold text-lg mb-4'>COMMENTS</h3>
 									<div className='flex flex-col gap-3 max-h-60 overflow-auto'>
@@ -168,23 +168,23 @@ const Post = ({ post }:any) => {
 											</p>
 										)}
 										{post.comments.map((comment:any) => (
-											<div key={comment._id} className='flex gap-2 items-start'>
+											<div key={comment?._id} className='flex gap-2 items-start'>
 												<div className='avatar'>
 													<div className='w-8 rounded-full'>
 														<img
-															src={comment.user.profileImg || "/avatar-placeholder.png"}
+															src={comment?.user.profileImg || "/avatar-placeholder.png"}
 														/>
 													</div>
 												</div>
 												<div className='flex flex-col'>
 													<div className='flex items-center gap-1'>
-														<span className='font-bold'>{comment.user.fullName}</span>
+														<span className='font-bold'>{comment?.user.fullName}</span>
 														<span className='text-gray-700 text-sm'>
-															@{comment.user.username}
+															@{comment?.user.username}
 														</span>
 													</div>
 									
-													<div className='text-sm'>{comment.text}</div>
+													<div className='text-sm'>{comment?.text}</div>
 												</div>
 											</div>
 										))}
@@ -230,7 +230,7 @@ const Post = ({ post }:any) => {
 										isLiked ? "text-pink-500" : "text-slate-500"
 									}`}
 								>
-									{post.likes.length}
+									{post?.likes.length}
 								</span>
 							</div>
 						</div>
