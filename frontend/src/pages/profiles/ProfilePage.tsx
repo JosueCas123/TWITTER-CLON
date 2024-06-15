@@ -21,8 +21,8 @@ import { useUdateProfile } from "../../hooks/useUdateProfile";
 
 const ProfilePage = () => {
 
-	const [coverImage, setCoverImage] = useState(null);
-	const [profileImage, setProfileImage] = useState(null);
+	const [coverImage, setCoverImage] = useState<null | string>(null);
+	const [profileImage, setProfileImage] = useState<null | string>(null);
 	const [feedType, setFeedType] = useState("posts");
 	
 	const coverImgRef: React.MutableRefObject<HTMLInputElement | null> = useRef(null);
@@ -36,20 +36,25 @@ const ProfilePage = () => {
 	
 	const isMyProfile = authUser?._id === user?._id;
 	const amIFollowing = authUser?.following.includes(user?._id);
-const handleImgChange = (e: any, p0: string) => {
-    const file = e.target.files[0];
-    if (file) {
-        const reader: FileReader = new FileReader();
-        reader.onload = () => {
-            const result = reader.result as any;
-            if (result !== null) {
-                p0 === "coverImg" && setCoverImage(result);
-                p0 === "profileImg" && setProfileImage(result);
-            }
-        };
-        reader.readAsDataURL(file);
-    }
-};
+
+	const handleImgChange = (e:any, type:any) => {
+		const file = e.target.files[0];
+		if (file) {
+			const reader = new FileReader();
+			reader.onload = () => {
+			  const result = reader.result as string;
+			  if (result) {
+				if (type === "coverImg") {
+				  setCoverImage(result);
+				} else if (type === "profileImg") {
+				  setProfileImage(result);
+				}
+			  }
+			};
+			reader.readAsDataURL(file);
+		}
+	};
+
 useEffect(() => {
 	refetch();
 }, [username, refetch]);
