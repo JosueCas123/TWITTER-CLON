@@ -13,6 +13,7 @@ import { useCommetPost } from "../../hooks/useCommetPost";
 import ReactTimeago from "react-timeago";
 
 const Post = ({ post }:any) => {
+	
 	console.log("post",post);
 	const {data:authUser}:any= useQuery({queryKey: ['authUser']});
 	const queryClient = useQueryClient();
@@ -132,10 +133,10 @@ const Post = ({ post }:any) => {
 						)}
 					</div>
 					<div className='flex flex-col gap-3 overflow-hidden'>
-						<span>{post.text}</span>
-						{post.img && (
+						<span>{post?.text}</span>
+						{post?.img && (
 							<img
-								src={post.img}
+								src={post?.img}
 								className='h-80 object-contain rounded-lg border border-gray-700'
 								alt=''
 							/>
@@ -162,7 +163,7 @@ const Post = ({ post }:any) => {
 								<div className='modal-box rounded border border-gray-600'>
 									<h3 className='font-bold text-lg mb-4'>COMMENTS</h3>
 									<div className='flex flex-col gap-3 max-h-60 overflow-auto'>
-										{post.comments.length === 0 && (
+										{post?.comments.length === 0 && (
 											<p className='text-sm text-slate-500'>
 												No comments yet 🤔 Be the first one 😉
 											</p>
@@ -172,15 +173,15 @@ const Post = ({ post }:any) => {
 												<div className='avatar'>
 													<div className='w-8 rounded-full'>
 														<img
-															src={comment?.user.profileImg || "/avatar-placeholder.png"}
+															src={comment?.user?.profileImg || "/avatar-placeholder.png"}
 														/>
 													</div>
 												</div>
 												<div className='flex flex-col'>
 													<div className='flex items-center gap-1'>
-														<span className='font-bold'>{comment?.user.fullName}</span>
+														<span className='font-bold'>{comment?.user?.fullName}</span>
 														<span className='text-gray-700 text-sm'>
-															@{comment?.user.username}
+															@{comment?.user?.username}
 														</span>
 													</div>
 									
@@ -230,7 +231,7 @@ const Post = ({ post }:any) => {
 										isLiked ? "text-pink-500" : "text-slate-500"
 									}`}
 								>
-									{post?.likes.length}
+									{post?.likes?.length}
 								</span>
 							</div>
 						</div>
